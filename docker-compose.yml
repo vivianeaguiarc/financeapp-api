@@ -1,0 +1,16 @@
+services:
+    postgres:
+        image: postgres:latest
+        container_name: finance-app-postgres
+        restart: always
+        environment:
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: financeapp
+        ports:
+            - '5432:5432'
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+
+volumes:
+    pgdata:
