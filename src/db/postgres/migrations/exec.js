@@ -22,3 +22,5 @@ const execMigrations = async () => {
     }
 }
 execMigrations()
+
+// aula introdução ao express e postman (continuação)
