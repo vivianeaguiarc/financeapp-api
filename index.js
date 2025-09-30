@@ -1,12 +1,42 @@
+import 'dotenv/config'
 import express from 'express'
-import { PostgresHelper } from './src/db/postgres/helper.js'
+import {
+    CreateUserController,
+    GetUserByIdController,
+    UpdateUserController,
+    DeleteUserController,
+} from './src/controllers/index.js'
+import { GetUserByIdUseCase } from './src/use-cases/index.js'
+import { PostgresGetUserByIdRepository } from './src/repositories/postgres/get-user-by-id.js'
 
 const app = express()
-app.get('/', async (req, res) => {
-    const results = await PostgresHelper.query('SELECT * FROM users;')
-    res.send(JSON.stringify(results))
+app.use(express.json())
+
+app.get('/api/users/:userId', async (request, response) => {
+    const getUserByIdRepository = new PostgresGetUserByIdRepository()
+    const getUserByIdUseCase = new GetUserByIdUseCase(getUserByIdRepository)
+    const getUserByIdController = new GetUserByIdController(getUserByIdUseCase)
+    const { statusCode, body } = await getUserByIdController.execute(request)
+    response.status(statusCode).send(body)
 })
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000')
+app.post('/api/users', async (request, response) => {
+    const createUserController = new CreateUserController()
+    const { statusCode, body } = await createUserController.execute(request)
+    response.status(statusCode).json(body)
+})
+app.patch('/api/users/:userId', async (request, response) => {
+    const updateUserController = new UpdateUserController()
+    const { statusCode, body } = await updateUserController.execute(request)
+    response.status(statusCode).json(body)
+})
+
+app.delete('/api/users/:userId', async (request, response) => {
+    const deleteUserController = new DeleteUserController()
+    const { statusCode, body } = await deleteUserController.execute(request)
+    response.status(statusCode).send(body)
+})
+
+app.listen(process.env.PORT, () => {
+    console.log(`Listening on port ${process.env.PORT}`)
 })
